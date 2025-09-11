@@ -1,0 +1,1 @@
+coraza-spoa 0.4.0 json:map(.html_url)[]:.+ https://api.github.com/repos/corazawaf/coraza-spoa/releases <v([0-9.]+)

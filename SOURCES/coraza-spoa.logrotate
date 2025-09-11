@@ -1,0 +1,15 @@
+/var/log/coraza-spoa/*.log {
+    missingok
+    rotate 10
+    daily
+    nocreate
+    compress
+    sharedscripts
+    postrotate
+	systemctl restart coraza-spoa >/dev/null 2>&1 || true
+    endscript
+
+    #compresscmd /usr/bin/xz
+    #uncompresscmd /usr/bin/unxz
+    #compressext .xz
+}

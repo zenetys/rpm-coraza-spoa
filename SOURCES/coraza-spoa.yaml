@@ -1,0 +1,22 @@
+bind: 127.0.0.1:9000
+
+log_file: /var/log/coraza-spoa/coraza-agent.log
+log_level: info
+log_format: json
+
+default_application: default_waf
+
+applications:
+  default_waf:
+    directives: |
+      Include /etc/coraza-spoa/coraza-engine.conf
+      #Include /etc/coraza-spoa/crs/crs-setup.conf
+      #Include /etc/coraza-spoa/crs/plugins/*-config.conf
+      #Include /etc/coraza-spoa/crs/plugins/*-before.conf
+      #Include /etc/coraza-spoa/crs/rules/*.conf
+      #Include /etc/coraza-spoa/crs/plugins/*-after.conf
+
+    response_check: false
+    transaction_ttl_ms: 60000
+    transaction_active_limit: 100000
+
