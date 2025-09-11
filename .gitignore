@@ -1,0 +1,5 @@
+RPMS/
+SOURCES/*.tar.gz
+SOURCES/*.tar.xz
+SRPMS/
+.*.swp
