@@ -20,8 +20,7 @@ URL: https://github.com/corazawaf/coraza-spoa
 
 Source0: https://github.com/corazawaf/coraza-spoa/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1: coraza-spoa.logrotate
-Source2: coraza-engine.conf
-Source3: config.yaml
+Source2: config.yaml
 
 Patch0: coraza-spoa-service.patch
 
@@ -61,8 +60,7 @@ fi
 install -D -p -m 0755 -t %{buildroot}/%{_sbindir}/ ./coraza-spoa
 install -D -p -m 0644 -t %{buildroot}/%{_unitdir}/ ./contrib/coraza-spoa.service
 install -D -p -m 0644 %{SOURCE1} %{buildroot}/%{_sysconfdir}/logrotate.d/coraza-spoa
-install -D -p -m 0644 %{SOURCE2} %{buildroot}/%{_sysconfdir}/coraza-spoa/coraza-engine.conf
-install -D -p -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/coraza-spoa/config.yaml
+install -D -p -m 0644 %{SOURCE2} %{buildroot}/%{_sysconfdir}/coraza-spoa/config.yaml
 install -d -m 0750 %{buildroot}/%{_localstatedir}/log/coraza-spoa
 
 %pre
@@ -87,7 +85,6 @@ fi
 %license LICENSE
 %doc CHANGELOG.md README.md
 %dir %{_sysconfdir}/coraza-spoa
-%config(noreplace) %{_sysconfdir}/coraza-spoa/coraza-engine.conf
 %config(noreplace) %{_sysconfdir}/coraza-spoa/config.yaml
 %config(noreplace) %{_sysconfdir}/logrotate.d/coraza-spoa
 %{_sbindir}/coraza-spoa
