@@ -1,6 +1,6 @@
 | <nobr>Package name</nobr> | <nobr>Supported targets</nobr> |
 | :--- | :--- |
-| owasp-coraza-spoa | <nobr>el9, el10</nobr> |
+| coraza-spoa | <nobr>el9, el10</nobr> |
 <br/>
 
 ## Build:
