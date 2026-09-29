@@ -35,6 +35,7 @@ Source30: haproxy.cfg.sample
 Source31: haproxy-spoe-coraza.conf.sample
 
 Patch0: coraza-spoa-service.patch
+Patch1: coraza-spoa-no-coreruleset.patch
 
 BuildRequires: go-rpm-macros
 BuildRequires: golang >= 1.25.7
@@ -56,6 +57,7 @@ and is 100% compatible with the OWASP Core Rule Set v4.
 %setup -c
 cd coraza-spoa-%{version}
 %patch -P 0 -p1
+%patch -P 1 -p1
 cd ..
 
 # coreruleset

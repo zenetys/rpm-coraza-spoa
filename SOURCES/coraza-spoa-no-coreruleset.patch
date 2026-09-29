@@ -1,0 +1,51 @@
+diff -Nurp coraza-spoa-0.9.0.ori/go.mod coraza-spoa-0.9.0/go.mod
+--- coraza-spoa-0.9.0.ori/go.mod
++++ coraza-spoa-0.9.0/go.mod
+@@ -3,7 +3,6 @@ module github.com/corazawaf/coraza-spoa
+ go 1.25.7
+ 
+ require (
+-	github.com/corazawaf/coraza-coreruleset/v4 v4.25.0
+ 	github.com/corazawaf/coraza/v3 v3.7.0
+ 	github.com/dropmorepackets/haproxy-go v0.1.1
+ 	github.com/fsnotify/fsnotify v1.10.1
+diff -Nurp coraza-spoa-0.9.0.ori/internal/application.go coraza-spoa-0.9.0/internal/application.go
+--- coraza-spoa-0.9.0.ori/internal/application.go
++++ coraza-spoa-0.9.0/internal/application.go
+@@ -15,14 +15,11 @@ import (
+ 	"sync"
+ 	"time"
+ 
+-	coreruleset "github.com/corazawaf/coraza-coreruleset/v4"
+ 	"github.com/corazawaf/coraza/v3"
+ 	"github.com/corazawaf/coraza/v3/experimental"
+ 	"github.com/corazawaf/coraza/v3/experimental/plugins/plugintypes"
+ 	"github.com/corazawaf/coraza/v3/types"
+ 	"github.com/dropmorepackets/haproxy-go/pkg/encoding"
+-	"github.com/jcchavezs/mergefs"
+-	"github.com/jcchavezs/mergefs/io"
+ 	"github.com/rs/zerolog"
+ )
+ 
+@@ -447,8 +444,7 @@ func (a AppConfig) NewApplication() (*Ap
+ 
+ 	config := coraza.NewWAFConfig().
+ 		WithDirectives(a.Directives).
+-		WithErrorCallback(app.logCallback).
+-		WithRootFS(mergefs.Merge(coreruleset.FS, io.OSFS))
++		WithErrorCallback(app.logCallback)
+ 
+ 	config = experimental.WAFConfigWithRuleObserver(config, func(rule types.RuleMetadata) {
+ 		version := rule.Version()
+diff -Nurp coraza-spoa-0.9.0.ori/magefile.go coraza-spoa-0.9.0/magefile.go
+--- coraza-spoa-0.9.0.ori/magefile.go
++++ coraza-spoa-0.9.0/magefile.go
+@@ -20,8 +20,6 @@ import (
+ 	"github.com/magefile/mage/mg"
+ 	"github.com/magefile/mage/sh"
+ 
+-	// Import as sideeffect for version detection based on build info.
+-	_ "github.com/corazawaf/coraza-coreruleset/v4"
+ )
+ 
+ var addLicenseVersion = "v1.1.1" // https://github.com/google/addlicense/releases
