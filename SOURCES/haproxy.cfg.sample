@@ -1,0 +1,60 @@
+global
+    log stdout len 2048 format raw local2
+    default-path origin /etc/haproxy
+    [...]
+
+frontend ft_main
+    [...]
+
+    # coraza-spoa: app selection; to avoid warning, tcp-request content
+    # rules must precede http-request rules
+    #tcp-request content set-var(txn._coraza_app) str(default)
+    #tcp-request content set-var(txn._coraza_app) req.hdr(host),host_only,map_str(map/coraza-apps.map,default)
+
+    # BEGIN log-format
+    acl src_trusted_xff bool(0)
+    http-request set-header X-Original-XFF %[req.hdr(X-Forwarded-For)] if !src_trusted_xff { req.hdr(X-Forwarded-For) -m found }
+    http-request del-header X-Forwarded-For if !src_trusted_xff
+    http-request set-var(txn.xff) req.hdr(X-Forwarded-For)
+    http-request set-var(txn.host) req.hdr(Host)
+    http-request set-var(txn.referer) req.fhdr(Referer)
+    http-request set-var(txn.content_length) req.hdr_val(content-length)
+    http-request set-var(txn.ua) req.fhdr(user-agent)
+    unique-id-format "%{+X}o %ci:%cp_%fi:%fp_%Ts_%rt:%pid"
+    unique-id-header X-Unique-ID
+    log-format "${HAPROXY_HTTPS_LOG_FMT} host.name=%{+Q,+E}H haproxy.unique_id=%{+Q,+E}ID url.domain=%{+Q,+E}[var(txn.host)] client.ip=%{+Q,+E}[var(txn.xff)] haproxy.bytes_uploaded=%{-M}U http.request.body.bytes=%{-M}[var(txn.content_length)] http.request.referrer=%{+Q,+E}[var(txn.referer)] user_agent.original=%{+Q,+E}[var(txn.ua)] coraza.app=%{+Q,+E}[var(txn._coraza_app)] coraza.error=%{-M}[var(txn.coraza.error)] coraza.action=%{+Q,+E}[var(txn.coraza.action)] coraza.status=%{-M}[var(txn.coraza.status)] coraza.ruleid=%{-M}[var(txn.coraza.ruleid)] coraza.data=%{+Q,+E}[var(txn.coraza.data)] coraza.total_time=%{-M}[var(txn.coraza.total_time)]"
+    # END log-format
+
+    # BEGIN coraza-spoa
+    option http-buffer-request
+    compression algo-res gzip
+    compression type-res text/ application/json application/x-ndjson application/ndjson application/javascript application/xml image/svg+xml
+    compression minsize-res 1024
+    compression offload
+    filter spoe engine coraza config spoe/coraza.conf
+    filter comp-res # haproxy < 3.4: filter compression
+    http-request deny status 403 if { var(txn.coraza.action) -m str deny }
+    http-request silent-drop if { var(txn.coraza.action) -m str drop }
+    # wait for body (up to buffer size), then send it to coraza;
+    # timeout should be >= timeout server
+    # mime restriction should match coraza SecResponseBodyMimeType
+    http-response wait-for-body time 30s if { var(txn.coraza.id) -m found } { res.fhdr(content-type),field(1,;) -m str text/plain text/html text/xml }
+    http-response send-spoe-group coraza coraza-res-group if { var(txn.coraza.id) -m found }
+    http-response deny status 403 if { var(txn.coraza.action) -m str deny }
+    http-response silent-drop if { var(txn.coraza.action) -m str drop }
+    # block unconditionally on coraza error, ie: fail-closed
+    #http-request deny status 503 if { var(txn.coraza.error) -m int gt 0 }
+    #http-response deny status 503 if { var(txn.coraza.error) -m int gt 0 }
+    # END coraza-spoa
+
+    [...]
+
+backend bk_coraza_spoa
+    mode tcp
+    option spop-check
+    retries 1
+    timeout connect 200ms
+    timeout queue 200ms
+    timeout check 1s
+    timeout server 2m
+    server coraza1 127.0.0.1:9000 check inter 2s fastinter 1s downinter 1s rise 1 fall 2

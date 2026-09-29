@@ -1,0 +1,33 @@
+[coraza]
+
+spoe-agent coraza-agent
+    # when coraza-res (response) is NOT used, coraza must be configured
+    # with response_check: false, or it will wait transaction_ttl_ms
+    # before emitting the audit log
+    messages coraza-req
+    #messages coraza-req coraza-res
+    groups coraza-res-group
+    option var-prefix coraza
+    option set-on-error error
+    option set-process-time process_time
+    option set-total-time total_time
+    timeout processing 500ms
+    use-backend bk_coraza_spoa
+    log global
+
+spoe-message coraza-req
+    args app=var(txn._coraza_app) id=unique-id src-ip=src src-port=src_port dst-ip=dst dst-port=dst_port method=method path=path query=query version=req.ver headers=req.hdrs body=req.body exportRuleIDs=bool(true)
+    event on-frontend-http-request
+
+spoe-message coraza-res
+    args app=var(txn._coraza_app) id=var(txn.coraza.id) version=res.ver status=status headers=res.hdrs body=res.body exportRuleIDs=bool(true)
+    # opportunistic inspection: the body, possibly truncated, is
+    # inspected if it arrived along with the headers; otherwise,
+    # only the status and headers are.
+    #event on-http-response if { var(txn.coraza.id) -m found }
+
+# explicit wait-for-body inspection: the response is sent manually to the
+# SPOA from the frontend via http-response send-spoe-group after an
+# explicit http-response wait-for-body.
+spoe-group coraza-res-group
+    messages coraza-res

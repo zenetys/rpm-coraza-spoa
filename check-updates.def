@@ -1,1 +1,2 @@
-coraza-spoa 0.4.0 json:map(.html_url)[]:.+ https://api.github.com/repos/corazawaf/coraza-spoa/releases <v([0-9.]+)
+coraza-spoa 0.9.0 json:map(.html_url)[]:.+ https://api.github.com/repos/corazawaf/coraza-spoa/releases <v([0-9.]+)
+coreruleset-lts-v4.25.x 4.25.1 json:map(.html_url)[]:.+ https://api.github.com/repos/coreruleset/coreruleset/releases <v(4\.25\.[0-9.]+)

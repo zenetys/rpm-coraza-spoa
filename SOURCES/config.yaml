@@ -1,22 +1,39 @@
 bind: 127.0.0.1:9000
 
-log_file: /var/log/coraza-spoa/coraza-agent.log
 log_level: info
-log_format: json
+log_file: /dev/stdout
+log_format: console
 
-default_application: default_waf
+default_application: default
 
 applications:
-  default_waf:
+  - name: default
     directives: |
-      Include /etc/coraza-spoa/coraza-engine.conf
-      #Include /etc/coraza-spoa/crs/crs-setup.conf
-      #Include /etc/coraza-spoa/crs/plugins/*-config.conf
-      #Include /etc/coraza-spoa/crs/plugins/*-before.conf
-      #Include /etc/coraza-spoa/crs/rules/*.conf
-      #Include /etc/coraza-spoa/crs/plugins/*-after.conf
+      # Keep trace of coraza application name in logs
+      SecComponentSignature "coraza-app/default"
 
-    response_check: false
-    transaction_ttl_ms: 60000
-    transaction_active_limit: 100000
+      # coraza.conf-recommended from https://github.com/corazawaf/coraza
+      Include /usr/share/coraza-spoa/coraza.conf-recommended
 
+      # Custom configuration
+      Include /etc/coraza-spoa/default/pre-crs/*.conf
+
+      # OWASP CRS v4 from https://github.com/coreruleset/coreruleset/releases
+      Include /usr/share/coraza-spoa/coreruleset/crs-setup.conf.example
+      Include /usr/share/coraza-spoa/coreruleset/rules/*.conf
+
+      # custom rule and exclusions
+      Include /etc/coraza-spoa/default/post-crs/*.conf
+
+    # HAProxy configured to send SPOE messages:
+    # - requests only: set response_check false
+    # - requests + responses: set response_check true
+    response_check: true
+
+    # Transaction cache lifetime in milliseconds, relevant only with
+    # requests + response SPOE messages:
+    transaction_ttl_ms: 90000
+
+    log_level: info
+    log_file: /var/log/coraza-spoa/default.log
+    log_format: json

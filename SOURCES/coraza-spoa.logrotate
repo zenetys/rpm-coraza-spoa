@@ -6,7 +6,7 @@
     compress
     sharedscripts
     postrotate
-	systemctl restart coraza-spoa >/dev/null 2>&1 || true
+        systemctl try-restart coraza-spoa.service || true
     endscript
 
     #compresscmd /usr/bin/xz
