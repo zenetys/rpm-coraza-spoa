@@ -11,9 +11,10 @@ spoe-agent coraza-agent
     option set-on-error error
     option set-process-time process_time
     option set-total-time total_time
+    option dontlog-normal
+    log global
     timeout processing 500ms
     use-backend bk_coraza_spoa
-    log global
 
 spoe-message coraza-req
     args app=var(txn._coraza_app) id=unique-id src-ip=src src-port=src_port dst-ip=dst dst-port=dst_port method=method path=path query=query version=req.ver headers=req.hdrs body=req.body exportRuleIDs=bool(true)
