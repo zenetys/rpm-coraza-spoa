@@ -1,6 +1,6 @@
 # Supported targets: el9, el10
 
-%define coraza_spoa_version 0.9.0
+%define coraza_spoa_version 0.9.1
 %define coreruleset_version 4.25.2
 
 %if 0%{?rhel} >= 10
@@ -16,7 +16,7 @@
 
 Name: coraza-spoa
 Version: %coraza_spoa_version
-Release: 2.crs%{coreruleset_version}%{?dist}.zenetys
+Release: 1.crs%{coreruleset_version}%{?dist}.zenetys
 Summary: A wrapper for integrating the OWASP Coraza WAF with HAProxy's SPOE filters
 License: Apache-2.0
 URL: https://github.com/corazawaf/coraza-spoa

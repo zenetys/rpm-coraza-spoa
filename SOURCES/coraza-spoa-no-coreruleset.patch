@@ -1,17 +1,33 @@
-diff -Nurp coraza-spoa-0.9.0.ori/go.mod coraza-spoa-0.9.0/go.mod
---- coraza-spoa-0.9.0.ori/go.mod
-+++ coraza-spoa-0.9.0/go.mod
+From 22ffc08fc491838304d5bc0e2f8f241eed30c4d9 Mon Sep 17 00:00:00 2001
+From: Julien Thomas <jthomas@zenetys.com>
+Date: Mon, 26 Oct 2026 10:48:41 +0100
+Subject: [PATCH 2/2] REORG: build: Remove embedded coreruleset
+
+We package an up-to-date LTS version in our RPM. To date, the
+coreruleset version embedded in coraza-spoa is too old to meet
+our requirements.
+---
+ go.mod                  | 1 -
+ internal/application.go | 6 +-----
+ magefile.go             | 2 --
+ 3 files changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/go.mod b/go.mod
+index 3264462..078e1da 100644
+--- a/go.mod
++++ b/go.mod
 @@ -3,7 +3,6 @@ module github.com/corazawaf/coraza-spoa
  go 1.25.7
  
  require (
 -	github.com/corazawaf/coraza-coreruleset/v4 v4.25.0
- 	github.com/corazawaf/coraza/v3 v3.7.0
+ 	github.com/corazawaf/coraza/v3 v3.8.1
  	github.com/dropmorepackets/haproxy-go v0.1.1
  	github.com/fsnotify/fsnotify v1.10.1
-diff -Nurp coraza-spoa-0.9.0.ori/internal/application.go coraza-spoa-0.9.0/internal/application.go
---- coraza-spoa-0.9.0.ori/internal/application.go
-+++ coraza-spoa-0.9.0/internal/application.go
+diff --git a/internal/application.go b/internal/application.go
+index bab18c1..71a8fb0 100644
+--- a/internal/application.go
++++ b/internal/application.go
 @@ -15,14 +15,11 @@ import (
  	"sync"
  	"time"
@@ -27,7 +43,7 @@ diff -Nurp coraza-spoa-0.9.0.ori/internal/application.go coraza-spoa-0.9.0/inter
  	"github.com/rs/zerolog"
  )
  
-@@ -447,8 +444,7 @@ func (a AppConfig) NewApplication() (*Ap
+@@ -447,8 +444,7 @@ func (a AppConfig) NewApplication() (*Application, error) {
  
  	config := coraza.NewWAFConfig().
  		WithDirectives(a.Directives).
@@ -37,9 +53,10 @@ diff -Nurp coraza-spoa-0.9.0.ori/internal/application.go coraza-spoa-0.9.0/inter
  
  	config = experimental.WAFConfigWithRuleObserver(config, func(rule types.RuleMetadata) {
  		version := rule.Version()
-diff -Nurp coraza-spoa-0.9.0.ori/magefile.go coraza-spoa-0.9.0/magefile.go
---- coraza-spoa-0.9.0.ori/magefile.go
-+++ coraza-spoa-0.9.0/magefile.go
+diff --git a/magefile.go b/magefile.go
+index f2e82f2..2ff4690 100644
+--- a/magefile.go
++++ b/magefile.go
 @@ -20,8 +20,6 @@ import (
  	"github.com/magefile/mage/mg"
  	"github.com/magefile/mage/sh"
@@ -49,3 +66,6 @@ diff -Nurp coraza-spoa-0.9.0.ori/magefile.go coraza-spoa-0.9.0/magefile.go
  )
  
  var addLicenseVersion = "v1.1.1" // https://github.com/google/addlicense/releases
+-- 
+2.56.0
+
