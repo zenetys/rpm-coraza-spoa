@@ -16,7 +16,7 @@
 
 Name: coraza-spoa
 Version: %coraza_spoa_version
-Release: 1.crs%{coreruleset_version}%{?dist}.zenetys
+Release: 2.crs%{coreruleset_version}%{?dist}.zenetys
 Summary: A wrapper for integrating the OWASP Coraza WAF with HAProxy's SPOE filters
 License: Apache-2.0
 URL: https://github.com/corazawaf/coraza-spoa
@@ -37,6 +37,8 @@ Source31: haproxy-spoe-coraza.conf.sample
 Patch0: coraza-spoa-service.patch
 Patch1: coraza-spoa-no-coreruleset.patch
 
+Patch10: coreruleset-001-backport-e64aac3.patch
+
 BuildRequires: go-rpm-macros
 BuildRequires: golang >= 1.25.7
 BuildRequires: systemd-rpm-macros
@@ -44,6 +46,9 @@ BuildRequires: systemd-rpm-macros
 # caching of go module dependencies
 BuildRequires: tar
 BuildRequires: xz
+
+# patchutils provides filterdiff
+BuildRequires: patchutils
 
 %{?systemd_requires}
 
@@ -62,6 +67,9 @@ cd ..
 
 # coreruleset
 %setup -T -D -a 1
+cd coreruleset-%{coreruleset_version}
+filterdiff -p1 -x 'tests/*' -x 'CHANGES.md' %{PATCH10} |patch -p1
+cd ..
 
 %build
 export GOPATH=%{_builddir}/gopath
