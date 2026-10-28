@@ -10,6 +10,8 @@ frontend ft_main
     # rules must precede http-request rules
     #tcp-request content set-var(txn._coraza_app) str(default)
     #tcp-request content set-var(txn._coraza_app) req.hdr(host),host_only,map_str(map/coraza-apps.map,default)
+    # coraza-spoa: hash key for bk_coraza_spoa
+    tcp-request content set-var(txn._coraza_lb) rand
 
     # BEGIN log-format
     acl src_trusted_xff bool(0)
@@ -57,4 +59,9 @@ backend bk_coraza_spoa
     timeout queue 200ms
     timeout check 1s
     timeout server 2m
-    server coraza1 127.0.0.1:9000 check inter 2s fastinter 1s downinter 1s rise 1 fall 2
+    # persist the whole transaction (request, response) on the same agent
+    balance hash var(ptxn._coraza_lb)
+    hash-type consistent
+    default-server check inter 2s fastinter 1s downinter 1s rise 1 fall 2
+    server coraza1 127.0.0.1:9000
+    #server coraza2 127.0.0.1:9001
