@@ -97,8 +97,8 @@ install -D -p -m 0644 %{SOURCE21} %{buildroot}/%{_sysconfdir}/coraza-spoa/defaul
 install -D -p -m 0644 %{SOURCE22} %{buildroot}/%{_sysconfdir}/coraza-spoa/default/post-crs/00-custom.conf
 install -d -m 0750 %{buildroot}/%{_localstatedir}/log/coraza-spoa
 install -D -p -m 0644 -t %{buildroot}/%{_datadir}/coraza-spoa/ vendor/github.com/corazawaf/coraza/v3/coraza.conf-recommended
-install -D -p -m 0644 %{SOURCE30} %{buildroot}/%{_datadir}/coraza-spoa/haproxy/haproxy.cfg.sample
-install -D -p -m 0644 %{SOURCE31} %{buildroot}/%{_datadir}/coraza-spoa/haproxy/spoe-coraza.conf.sample
+install -D -p -m 0644 %{SOURCE30} %{buildroot}/%{_datadir}/coraza-spoa/haproxy.cfg.sample
+install -D -p -m 0644 %{SOURCE31} %{buildroot}/%{_datadir}/coraza-spoa/haproxy-spoe-coraza.conf.sample
 cd ..
 
 # coreruleset
